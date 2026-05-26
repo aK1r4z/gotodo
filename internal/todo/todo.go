@@ -7,8 +7,7 @@ import (
 )
 
 type TODO struct {
-	ID  uuid.UUID
-	Num int32
+	ID uuid.UUID
 
 	Title   string
 	Content string
@@ -21,8 +20,7 @@ type TODO struct {
 
 func New(title string, content string) *TODO {
 	return &TODO{
-		ID:  uuid.Nil,
-		Num: -1,
+		ID: uuid.Nil,
 
 		Title:   title,
 		Content: content,

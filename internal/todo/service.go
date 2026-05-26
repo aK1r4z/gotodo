@@ -6,10 +6,12 @@ import (
 	"strings"
 )
 
+// 待办服务
 type service struct {
 	todoStore Store
 }
 
+// 创建待办服务
 func NewService(
 	todoStore Store,
 ) (*service, error) {
@@ -18,6 +20,7 @@ func NewService(
 	}, nil
 }
 
+// 创建待办
 func (s *service) Create(ctx context.Context, title string, content string) error {
 	td := New(title, content)
 
@@ -29,6 +32,7 @@ func (s *service) Create(ctx context.Context, title string, content string) erro
 	return nil
 }
 
+// 列出所有待办，返回字符串
 func (s *service) List(ctx context.Context) (string, error) {
 	const limit = 10
 	const offset = 0
@@ -40,23 +44,9 @@ func (s *service) List(ctx context.Context) (string, error) {
 
 	builder := strings.Builder{}
 
-	for _, td := range list {
-		fmt.Fprintf(&builder, "[%d] [ ] %s\n", td.Num, td.Title)
+	for _, r := range list {
+		fmt.Fprintf(&builder, "[%d] [ ] %s\n", r.Num, r.Todo.Title)
 	}
 
 	return builder.String(), nil
-}
-
-func (s *service) Sort(ctx context.Context) error {
-	list, err := s.todoStore.List(ctx, 10, 0)
-	if err != nil {
-		return err
-	}
-
-	err = s.todoStore.Sort(ctx, list)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

@@ -7,14 +7,17 @@ import (
 
 	"github.com/aK1r4z/gotodo/internal/store/postgres"
 	"github.com/aK1r4z/gotodo/internal/todo"
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	fmt.Println("Hello, GO!")
 
+	godotenv.Load()
+
 	ctx := context.Background()
 
-	pgsql, err := postgres.NewDB(ctx, "")
+	pgsql, err := postgres.NewDB(ctx, os.Getenv("CONNSTR"))
 	if err != nil {
 		panic(err)
 	}
@@ -48,16 +51,5 @@ func main() {
 		}
 
 		fmt.Printf("Created %s %s\n", title, content)
-	case "sort":
-		if err := todoService.Sort(ctx); err != nil {
-			panic(err)
-		}
-
-		str, err := todoService.List(ctx)
-		if err != nil {
-			panic(err)
-		}
-
-		fmt.Println(str)
 	}
 }
