@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 )
 
 // 待办服务
@@ -49,4 +50,34 @@ func (s *service) List(ctx context.Context) (string, error) {
 	}
 
 	return builder.String(), nil
+}
+
+// 查询指定顺序编号的待办项的详细信息
+func (s *service) GetByNumber(ctx context.Context, num uint32) (string, error) {
+	td, err := s.todoStore.GetByNumber(ctx, num)
+	if err != nil {
+		return "", err
+	}
+
+	if td == nil {
+		return "Err: Not found", nil
+	}
+
+	result := fmt.Sprintf("Title: %s", td.Title)
+
+	if td.Content != "" {
+		result += fmt.Sprintf("\nContent: %s", td.Content)
+	}
+
+	result += fmt.Sprintf("\nCreated At: %s", td.CreatedAt.Format(time.DateTime))
+
+	if td.DeletedAt != nil {
+		result += fmt.Sprintf("\nDeleted At: %s", td.DeletedAt.Format(time.DateTime))
+	}
+
+	if td.Completed {
+		result += "\nCompleted: TRUE"
+	}
+
+	return result, nil
 }

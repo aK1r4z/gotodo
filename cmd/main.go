@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/aK1r4z/gotodo/internal/store/postgres"
 	"github.com/aK1r4z/gotodo/internal/todo"
@@ -29,10 +30,6 @@ func main() {
 		panic(err)
 	}
 
-	for i, a := range os.Args {
-		fmt.Printf("%d %s\n", i, a)
-	}
-
 	switch os.Args[1] {
 	case "list":
 		str, err := todoService.List(ctx)
@@ -51,5 +48,17 @@ func main() {
 		}
 
 		fmt.Printf("Created %s %s\n", title, content)
+	default:
+		num, err := strconv.Atoi(os.Args[1])
+		if err != nil {
+			panic(err)
+		}
+
+		str, err := todoService.GetByNumber(ctx, uint32(num))
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Println(str)
 	}
 }

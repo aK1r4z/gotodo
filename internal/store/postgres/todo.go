@@ -70,6 +70,30 @@ func (s *todoStore) List(ctx context.Context, limit uint32, offset uint32) ([]to
 	return result, nil
 }
 
+func (s *todoStore) GetByNumber(ctx context.Context, num uint32) (*todo.TODO, error) {
+	sql := `
+		SELECT
+			id, title, content, completed, created_at, deleted_at
+		FROM (
+			SELECT
+				ROW_NUMBER() OVER (ORDER BY created_at) AS num,
+				id, title, content, completed, created_at, deleted_at
+			FROM todos
+		) AS t
+		WHERE num = $1
+		;
+	`
+
+	row := s.db.QueryRow(ctx, sql, num)
+
+	var td todo.TODO
+	if err := row.Scan(&td.ID, &td.Title, &td.Content, &td.Completed, &td.CreatedAt, &td.DeletedAt); err != nil {
+		return nil, err
+	}
+
+	return &td, nil
+}
+
 func (s *todoStore) Update(ctx context.Context, todo *todo.TODO) error {
 	sql := `
 		update
